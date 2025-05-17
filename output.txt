@@ -1,7 +1,0 @@
-chapter1_assignment.js
-demo.txt
-index.js
-lib.js
-node_modules
-package.json
-package-lock.json
