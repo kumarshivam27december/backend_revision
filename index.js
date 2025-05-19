@@ -12,7 +12,7 @@ const port = 8080;
 server.use(express.static('public'));
 
 server.use((req,res,next)=>{
-    console.log(
+    console.log( 
         req.method, 
         req.url, 
         req.hostname, 
