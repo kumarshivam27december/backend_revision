@@ -4,42 +4,71 @@ const indexpage = fs.readFileSync('./index.html','utf-8');
 const page404 = fs.readFileSync('./page404.html','utf-8');
 const datas = JSON.parse(fs.readFileSync('./data.json','utf-8'));
 const products = datas.products;
-console.log(products);
-const server = http.createServer((req,res)=>{
-    console.log(req.url);
-    console.log('server started');
+const express = require('express');
+const server = express();
+const morgan = require('morgan');
+const port = 8080;
 
-    if(req.url.startsWith('/product')){
-        const id = (req.url.split('/'))[2];
-        console.log(id);
-        let product = products.find(p=>p.id===(+id));
+server.use(express.static('public'));
 
-        console.log(product);
-        res.setHeader('content-type','text/html');
-            let updatedpage = indexpage;
-            updatedpage=updatedpage.replace('**title**',product.title);
-            updatedpage=updatedpage.replace('**description**',product.description);
-            updatedpage=updatedpage.replace('**availabilityStatus**',product.availabilityStatus);
-            updatedpage=updatedpage.replace('**price**',product.price);
-            updatedpage=updatedpage.replace('**rating**',product.reviews[0].rating.toFixed(1));
-            updatedpage=updatedpage.replace('**thumbnail**',product.thumbnail);
-            res.end(updatedpage);
-            return;
+server.use((req,res,next)=>{
+    console.log(
+        req.method, 
+        req.url, 
+        req.hostname, 
+        new Date(), 
+        req.get('User-Agent')
+    );
+    next();
+});
+
+// server.use(morgan('default'));
+
+server.use(express.json());// body parser to parse json data
+// server.use(express.urlencoded); //for form data
+ 
+const auth = (req,res,next)=>{
+    // console.log(req.query);
+    if(req.body.password =='1234'){
+        next();
+    }else{
+        res.sendStatus(401);
     }
-    switch(req.url){
-        case '/':
-            res.setHeader('content-type','text/html');
-            res.end(indexpage);
-            break;
-        case '/api':
-            res.setHeader('content-type','application/json');
-            res.end(JSON.stringify(datas));
-            break;
+}
 
-        default:
-            res.statusCode = 404;
-            res.setHeader('content-type','text/html');
-            res.end(page404);
-    }
+// server.use(auth);
+
+// Remove this route to allow express.static to serve index.html at '/'
+
+// Removed any GET '/' route so express.static can serve index.html
+
+// server.get('/',(req,res)=>{ 
+//     res.json({type:"get"});
+// });
+server.post('/',auth,(req,res)=>{
+    res.json({type:"post"});
 })
-server.listen(8080);
+server.delete('/',(req,res)=>{
+    res.json({type:"delete"});
+})
+server.put('/',(req,res)=>{
+    res.json({type:"put"});
+})
+server.patch('/',(req,res)=>{
+    res.json({type:"patch"});
+})
+
+
+/*
+server.get('/demo',(req,res)=>{
+    // res.send('<p>welcome to the <strong>home</strong> page<p>');
+    // res.sendFile('/home/shivam/complete_backend_revision/page404.html')
+    // res.json(datas);
+    // res.sendStatus(404); 
+})
+*/
+
+
+server.listen(port,()=>{
+    console.log(`server is running on port ${port}`);
+});
