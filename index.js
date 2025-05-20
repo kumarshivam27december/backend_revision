@@ -10,63 +10,74 @@ const morgan = require('morgan');
 const port = 8080;
 
 server.use(express.static('public'));
-
 server.use((req,res,next)=>{
-    console.log(
-        req.method, 
-        req.url, 
-        req.hostname, 
-        new Date(), 
-        req.get('User-Agent')
-    );
     next();
+})
+
+server.use(express.json());
+
+//producst api root or base url eg google.com/api/v2
+
+//read  get /products 
+server.get('/products',(req,res)=>{
+    res.json(products);
 });
 
-// server.use(morgan('default'));
 
-server.use(express.json());// body parser to parse json data
-// server.use(express.urlencoded); //for form data
+//read get /products/:id
+server.get('/products/:id',(req,res)=>{
+    console.log(req.params.id);
+    const id = +req.params.id;
+    const product = products.find(p=>p.id===id);
+    res.json(product);
+});
  
-const auth = (req,res,next)=>{
-    // console.log(req.query);
-    if(req.body.password =='1234'){
-        next();
-    }else{
-        res.sendStatus(401);
-    }
-}
 
-// server.use(auth);
-
-// Remove this route to allow express.static to serve index.html at '/'
-
-// Removed any GET '/' route so express.static can serve index.html
-
-// server.get('/',(req,res)=>{ 
-//     res.json({type:"get"});
-// });
-server.post('/',auth,(req,res)=>{
-    res.json({type:"post"});
+//create api using POST /products 
+server.post('/products',(req,res)=>{
+    console.log(req.body);
+    products.push(req.body);
+    res.json(req.body);
 })
-server.delete('/',(req,res)=>{
-    res.json({type:"delete"});
-})
-server.put('/',(req,res)=>{
-    res.json({type:"put"});
-})
-server.patch('/',(req,res)=>{
-    res.json({type:"patch"});
-})
+   
 
 
-/*
-server.get('/demo',(req,res)=>{
-    // res.send('<p>welcome to the <strong>home</strong> page<p>');
-    // res.sendFile('/home/shivam/complete_backend_revision/page404.html')
-    // res.json(datas);
-    // res.sendStatus(404); 
-})
-*/
+
+
+//update api using put /products  overwrite
+server.put('/products/:id',(req,res)=>{
+    console.log(req.body);
+    const id = +req.params.id;
+    const productIndex = products.findIndex(p=>p.id===id);
+    products.splice(productIndex,1,{...req.body,id:id});
+
+    res.status(201).json({"product":"successfully updated"});
+})    
+
+
+ 
+
+//update api using patch /products  only update what needed
+server.patch('/products/:id',(req,res)=>{
+    const id = +req.params.id;
+    const productIndex = products.findIndex(p=>p.id===id);
+    const product = products[productIndex];
+    products.splice(productIndex,1,{...product,...req.body});
+    res.sendStatus(201);
+})  
+
+
+//delete api using delete /product/:id 
+
+
+server.delete('/products/:id',(req,res)=>{
+    const id = +req.params.id;
+    const productIndex = products.findIndex(p=>p.id==id);
+    const product = products[productIndex];
+    products.splice(productIndex,1);
+    res.status(200).json(product);
+});
+  
 
 
 server.listen(port,()=>{
