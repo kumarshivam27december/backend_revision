@@ -1,40 +1,58 @@
-const fs = require('fs');
-const datas = JSON.parse(fs.readFileSync('./data.json','utf-8'));
-const users = datas.users;
+const model = require('../models/users');
+const Users = model.Users;
 
-exports.getalluser = (req,res)=>{
-    res.json(users);
+exports.getalluser = async (req, res) => {
+    const doc = await Users.find();
+    res.json(doc);
 }
-exports.getuser = (req,res)=>{
-    console.log(req.params.id);
-    const id = +req.params.id;
-    const user = users.find(p=>p.id===id);
-    res.json(user);
-}
-exports.createuser = (req,res)=>{
-    console.log(req.body);
-    users.push(req.body);
-    res.json(req.body);
-}
-exports.replaceuser = (req,res)=>{
-    console.log(req.body);
-    const id = +req.params.id;
-    const userIndex = users.findIndex(p=>p.id===id);
-    users.splice(userIndex,1,{...req.body,id:id});
+exports.getuser = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const usr = await Users.findById(id);
+        console.log(usr);
+        res.json(usr);
+    } catch (err) {
+        res.json(err);
+    }
 
-    res.status(201).json({"product":"successfully updated"});
 }
-exports.updateuser = (req,res)=>{
-    const id = +req.params.id;
-    const userIndex = users.findIndex(p=>p.id===id);
-    const user = users[userIndex];
-    users.splice(userIndex,1,{...user,...req.body});
-    res.sendStatus(201);
+exports.createuser = async (req, res) => {
+    try {
+        const user = new Users(req.body);
+        const doc = await user.save();
+        res.json(doc);
+    } catch (err) {
+        console.log(err);
+        res.json(err);
+    }
 }
-exports.deleteuser = (req,res)=>{
-    const id = +req.params.id;
-    const userIndex = users.findIndex(p=>p.id==id);
-    const user = users[userIndex];
-    users.splice(userIndex,1);
-    res.status(200).json(user);
+exports.replaceuser = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const doc = await Users.findOneAndReplace({_id:id},req.body,{new:true});
+        res.json(doc);
+    } catch (err) {
+        console.log('cannot replace');
+        res.json(err);
+    }
+}
+exports.updateuser = async (req, res) => {
+    try {
+       const id = req.params.id;
+       const doc = await Users.findOneAndUpdate({_id:id},req.body,{new:true});
+       res.json(doc); 
+    } catch (err) {
+        console.log(err);
+        res.json(err);
+    }
+}
+exports.deleteuser = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const doc = await Users.findOneAndDelete({_id:id}); 
+        res.status(200).json(doc);   
+    } catch (err) {
+        console.log(err);
+        res.json(err);
+    }
 }

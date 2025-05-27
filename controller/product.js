@@ -1,40 +1,59 @@
-const fs = require('fs');
-const datas = JSON.parse(fs.readFileSync('./data.json','utf-8'));
-const products = datas.products;
+const model = require('../models/product');
+const Product = model.Product;
+const mongoose = require('mongoose');
 
-exports.getallproducts = (req,res)=>{
+exports.getallproducts = async (req, res) => {
+    const products = await Product.find();
     res.json(products);
 }
-exports.getproduct = (req,res)=>{
-    console.log(req.params.id);
-    const id = +req.params.id;
-    const product = products.find(p=>p.id===id);
-    res.json(product);
+exports.getproduct = async (req, res) => {
+    console.log('getting single product')
+    const id = req.params.id;
+    console.log(id);
+    const prd = await Product.findById(id);
+    res.json(prd);
 }
-exports.createproduct = (req,res)=>{
-    console.log(req.body);
-    products.push(req.body);
-    res.json(req.body);
+exports.createproduct = async (req, res) => {
+    const product = new Product(req.body);
+    // product.title = 'iphonex';
+    // product.description = 'this is an iphone';
+    // product.price=69;
+    try {
+        const doc = await product.save();
+        res.json(doc);
+    } catch (err) {
+        res.json(err);
+    }
 }
-exports.replaceproduct = (req,res)=>{
-    console.log(req.body);
-    const id = +req.params.id;
-    const productIndex = products.findIndex(p=>p.id===id);
-    products.splice(productIndex,1,{...req.body,id:id});
+exports.replaceproduct = async (req, res) => {
+    const id = req.params.id;
+    try{
+        const doc = await Product.findOneAndReplace({_id:id},req.body,{new:true})
+        res.status(201).json(doc);
+    }catch(err){
+        console.log(err);
+        res.json(403);
+    }
+}
+exports.updateproduct = async (req, res) => {
+    const id = req.params.id;
+    try{
+        const doc = await Product.findOneAndUpdate({_id:id},req.body,{new:true})
+        res.status(201).json(doc);
+    }catch(err){
+        console.log(err);
+        res.json(403);
+    }
+}
+exports.deleteproduct = async (req, res) => {
+    const id = req.params.id;
+    try{
+        const doc = await Product.findOneAndDelete({_id:id});
+        res.json(200).json(doc);
+        
+    }catch(err){
+        console.log(err);
+        res.json(err);
+    }
+}
 
-    res.status(201).json({"product":"successfully updated"});
-}
-exports.updateproduct = (req,res)=>{
-    const id = +req.params.id;
-    const productIndex = products.findIndex(p=>p.id===id);
-    const product = products[productIndex];
-    products.splice(productIndex,1,{...product,...req.body});
-    res.sendStatus(201);
-}
-exports.deleteproduct = (req,res)=>{
-    const id = +req.params.id;
-    const productIndex = products.findIndex(p=>p.id==id);
-    const product = products[productIndex];
-    products.splice(productIndex,1);
-    res.status(200).json(product);
-}
