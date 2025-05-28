@@ -2,20 +2,21 @@ require('dotenv').config();
 const express = require('express');
 const server = express();
 const mongoose = require('mongoose');
-
+const cors = require('cors');
 
 const productrouter = require('./routes/product');
 const userrouter = require('./routes/users')
 
+
 //db connect
 main().catch(err=>console.log(err));
 async function main(){
-    await mongoose.connect('mongodb://127.0.0.1:27017/ecommerce');
+    await mongoose.connect(process.env.MONGO_URL);
     console.log('database connected');
 }
 
-
-server.use(express.static('public'));
+server.use(cors()); 
+server.use(express.static('dist'));
 server.use((req,res,next)=>{
     next();
 })
