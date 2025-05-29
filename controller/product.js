@@ -1,11 +1,41 @@
 const model = require('../models/product');
 const Product = model.Product;
 const mongoose = require('mongoose');
+const ejs = require('ejs');
+const path = require('path');
+
+
+
+exports.getallproductsSSR = async (req, res) => {
+    const products = await Product.find();
+    ejs.renderFile(
+        path.resolve(__dirname, '../views/index.ejs'),
+        { products: products },
+        function (err, str) {
+            if (err) {
+                res.status(500).send('Error rendering page');
+            } else {
+                res.send(str);
+            }
+        }
+    );
+}
+
+
+exports.getaddform = async(req,res) =>{
+    ejs.renderFile(path.resolve(__dirname,'../views/add.ejs'), function (err,str){
+        res.send(str);
+    })
+}
+
 
 exports.getallproducts = async (req, res) => {
     const products = await Product.find();
     res.json(products);
 }
+
+
+
 exports.getproduct = async (req, res) => {
     console.log('getting single product')
     const id = req.params.id;

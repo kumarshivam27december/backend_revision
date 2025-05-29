@@ -15,7 +15,8 @@ async function main(){
     console.log('database connected');
 }
 
-server.use(cors()); 
+server.use(cors());
+server.use(express.urlencoded()) 
 server.use(express.static('dist'));
 server.use((req,res,next)=>{
     next();
