@@ -22,16 +22,45 @@ exports.getallproductsSSR = async (req, res) => {
 }
 
 
-exports.getaddform = async(req,res) =>{
-    ejs.renderFile(path.resolve(__dirname,'../views/add.ejs'), function (err,str){
+exports.getaddform = async (req, res) => {
+    ejs.renderFile(path.resolve(__dirname, '../views/add.ejs'), function (err, str) {
         res.send(str);
     })
 }
 
 
 exports.getallproducts = async (req, res) => {
-    const products = await Product.find();
-    res.json(products);
+    // let query = Product.find();
+    // if(req.query && req.query.sort){
+    //     const sortOrder = Number(req.query.sort);
+    //     if (sortOrder === 1 || sortOrder === -1) {
+    //         const products = await query.sort({ price: sortOrder }).exec();
+    //         return res.json(products);
+    //     } else {
+    //         return res.status(400).json({ error: 'Invalid sort value. Use 1 or -1.' });
+    //     }
+    // }else{
+    //     const products = await query.exec();
+    //     console.log(products);
+    // }
+
+    // const products = await Product.find();
+    // res.json(products);
+
+
+    let query = Product.find();
+    console.log(req.query);
+    if (req.query) {
+        const sortObj = {};
+        for (const key in req.query) {
+            sortObj[key] = Number(req.query[key]);
+        }
+        const products = await query.sort(sortObj).exec();
+        res.json(products);
+    } else {
+        const prd = await Product.find();
+        res.json(prd);
+    }
 }
 
 
@@ -57,31 +86,31 @@ exports.createproduct = async (req, res) => {
 }
 exports.replaceproduct = async (req, res) => {
     const id = req.params.id;
-    try{
-        const doc = await Product.findOneAndReplace({_id:id},req.body,{new:true})
+    try {
+        const doc = await Product.findOneAndReplace({ _id: id }, req.body, { new: true })
         res.status(201).json(doc);
-    }catch(err){
+    } catch (err) {
         console.log(err);
         res.json(403);
     }
 }
 exports.updateproduct = async (req, res) => {
     const id = req.params.id;
-    try{
-        const doc = await Product.findOneAndUpdate({_id:id},req.body,{new:true})
+    try {
+        const doc = await Product.findOneAndUpdate({ _id: id }, req.body, { new: true })
         res.status(201).json(doc);
-    }catch(err){
+    } catch (err) {
         console.log(err);
         res.json(403);
     }
 }
 exports.deleteproduct = async (req, res) => {
     const id = req.params.id;
-    try{
-        const doc = await Product.findOneAndDelete({_id:id});
+    try {
+        const doc = await Product.findOneAndDelete({ _id: id });
         res.json(200).json(doc);
-        
-    }catch(err){
+
+    } catch (err) {
         console.log(err);
         res.json(err);
     }
