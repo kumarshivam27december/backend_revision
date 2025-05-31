@@ -245,7 +245,20 @@
 </head>
 
 <body>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
+        const socket = io();
+        console.log('socket',socket.id)
+
+        setTimeout(() => {
+            socket.emit('msg',{player:'one '})
+        }, 6000);
+
+        socket.on('servermsg',(data)=>{
+            console.log({data});
+        })
+
+
         async function deleteProduct(product) {
             console.log(product);
             await fetch(`/products/${product}`, {

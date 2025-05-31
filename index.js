@@ -1,13 +1,15 @@
 require('dotenv').config();
 const express = require('express');
+require('./events')
 const server = express();
+const app = require('http').createServer(server);
+const io = require('socket.io')(app);
 const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const authrouter = require('./routes/auth')
 const productrouter = require('./routes/product');
 const userrouter = require('./routes/users')
-const cartRouter = require('./routes/cart')
 const path = require('path');
 const fs = require('fs');
 
@@ -44,13 +46,23 @@ server.use((req,res,next)=>{
 })
 
 server.use(express.json());
-server.use('/cart',cartRouter)
 server.use('/auth',authrouter.router)
 server.use('/products',productrouter.routers);
 server.use('/users',auth,userrouter.routers1);
 
 
-server.listen(process.env.PORT,()=>{
+io.on('connection',(socket)=>{
+    console.log('socket ',socket.id);
+    socket.on('msg',(data) =>{
+        console.log({data})
+    });
+    setTimeout(() => {
+        socket.emit('servermsq',{server:'hi'});
+    }, 4000);
+}); 
+
+
+app.listen(process.env.PORT,()=>{
     console.log(`server is running on port ${process.env.PORT}`);
 });
 

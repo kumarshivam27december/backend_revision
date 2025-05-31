@@ -3,7 +3,6 @@ const Product = model.Product;
 const mongoose = require('mongoose');
 const ejs = require('ejs');
 const path = require('path');
-const Cart = require('../models/cart')
 
 
 exports.addToCart = async (req, res) => {
