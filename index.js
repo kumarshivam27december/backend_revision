@@ -43,7 +43,7 @@ server.use((req,res,next)=>{
 
 server.use(express.json());
 server.use('/auth',authrouter.router)
-server.use('/products',auth,productrouter.routers);
+server.use('/products',productrouter.routers);
 server.use('/users',auth,userrouter.routers1);
 
 

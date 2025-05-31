@@ -7,10 +7,20 @@ const path = require('path');
 
 
 exports.getallproductsSSR = async (req, res) => {
-    const products = await Product.find();
+    const page = parseInt(req.query.page) || 1;
+    const limit = 2;
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+        Product.find().skip(skip).limit(limit),
+        Product.countDocuments()
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
     ejs.renderFile(
         path.resolve(__dirname, '../views/index.ejs'),
-        { products: products },
+        { products, page, totalPages },
         function (err, str) {
             if (err) {
                 res.status(500).send('Error rendering page');
@@ -19,8 +29,7 @@ exports.getallproductsSSR = async (req, res) => {
             }
         }
     );
-}
-
+};
 
 exports.getaddform = async (req, res) => {
     ejs.renderFile(path.resolve(__dirname, '../views/add.ejs'), function (err, str) {
