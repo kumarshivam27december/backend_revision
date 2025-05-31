@@ -7,8 +7,10 @@ const jwt = require('jsonwebtoken');
 const authrouter = require('./routes/auth')
 const productrouter = require('./routes/product');
 const userrouter = require('./routes/users')
+const cartRouter = require('./routes/cart')
 const path = require('path');
 const fs = require('fs');
+
 const public = fs.readFileSync(path.resolve(__dirname,'./public.key'),'utf-8');
 
 //db connect
@@ -42,6 +44,7 @@ server.use((req,res,next)=>{
 })
 
 server.use(express.json());
+server.use('/cart',cartRouter)
 server.use('/auth',authrouter.router)
 server.use('/products',productrouter.routers);
 server.use('/users',auth,userrouter.routers1);

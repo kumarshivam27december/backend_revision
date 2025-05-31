@@ -3,7 +3,27 @@ const Product = model.Product;
 const mongoose = require('mongoose');
 const ejs = require('ejs');
 const path = require('path');
+const Cart = require('../models/cart')
 
+
+exports.addToCart = async (req, res) => {
+    const userId = req.user._id; // assuming user is set by auth middleware
+    const productId = req.body.productId;
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+        cart = new Cart({ user: userId, products: [] });
+    }
+    cart.products.push(productId);
+    await cart.save();
+    res.json({ success: true });
+};
+
+
+exports.getCart = async (req, res) => {
+    const userId = req.user._id;
+    const cart = await Cart.findOne({ user: userId }).populate('products');
+    res.json(cart);
+};
 
 
 exports.getallproductsSSR = async (req, res) => {
