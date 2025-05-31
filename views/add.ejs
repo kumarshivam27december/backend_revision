@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Product</title>
+    <meta charset="UTF-8">
+</head>
+
+<body style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 40px;">
+    <div
+        style="max-width: 500px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center; margin-bottom: 24px;">Add Product</h2>
+        <form method="POST" action="/products" enctype="application/x-www-form-urlencoded">
+            <label style="display:block; margin-bottom:8px;">Title</label>
+            <input 
+                type="text" 
+                name="title" required
+                style="width:100%; 
+                       padding:8px; 
+                       margin-bottom:16px; 
+                       border:1px solid #ccc; 
+                       border-radius:4px;"
+            >
+
+            <label style="display:block; margin-bottom:8px;">Description</label>
+            <input 
+                type="text" 
+                name="description" required
+                style="width:100%; 
+                    padding:8px; 
+                    margin-bottom:16px; 
+                    border:1px solid #ccc; 
+                    border-radius:4px;"
+            >
+
+            <label style="display:block; margin-bottom:8px;">thumbnail</label>
+            <input 
+                type="url" 
+                name="thumbnail" 
+                placeholder="Enter image URL" required
+                style="width:100%; 
+                    padding:8px; 
+                    margin-bottom:16px; 
+                    border:1px solid #ccc; 
+                    border-radius:4px;"
+            >
+
+            <label style="display:block; margin-bottom:8px;">Price</label>
+            <input 
+                type="number" 
+                name="price" 
+                step="0.01" required
+                style="width:100%; 
+                    padding:8px; 
+                    margin-bottom:16px; 
+                    border:1px solid #ccc; 
+                    border-radius:4px;"
+            >
+
+            <label style="display:block; margin-bottom:8px;">Discounted Price</label>
+            <input 
+                type="number" 
+                name="discountedPrice" 
+                step="0.01" required
+                style="width:100%; 
+                       padding:8px; 
+                       margin-bottom:16px; 
+                       border:1px solid #ccc; 
+                       border-radius:4px;"
+            >
+
+            <label style="display:block; margin-bottom:8px;">Rating</label>
+            <input 
+                type="number" 
+                name="rating" 
+                min="0" 
+                max="5" 
+                step="0.1" required
+                style="width:100%; 
+                       padding:8px; 
+                       margin-bottom:24px; 
+                       border:1px solid #ccc; 
+                       border-radius:4px;"
+            >
+
+            <button type="submit"
+                style="width:100%; 
+                    padding:10px; 
+                    background:#007bff; 
+                    color:#fff; 
+                    border:none; 
+                    border-radius:4px; 
+                    font-size:16px; 
+                    cursor:pointer;"  
+            >
+            Add Product</button>
+        </form>
+    </div>
+</body>
+
+</html>
+</div>
+</body>
