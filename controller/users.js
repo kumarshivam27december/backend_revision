@@ -1,5 +1,7 @@
 const model = require('../models/users');
 const Users = model.Users;
+const jwt = require('jsonwebtoken');
+
 
 exports.getalluser = async (req, res) => {
     const doc = await Users.find();
@@ -19,6 +21,8 @@ exports.getuser = async (req, res) => {
 exports.createuser = async (req, res) => {
     try {
         const user = new Users(req.body);
+        var token = jwt.sign({email:req.body.email},'shhhh');
+        user.token = token;
         const doc = await user.save();
         res.json(doc);
     } catch (err) {
