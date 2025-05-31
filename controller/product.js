@@ -5,12 +5,41 @@ const ejs = require('ejs');
 const path = require('path');
 
 
+exports.addToCart = async (req, res) => {
+    const userId = req.user._id; // assuming user is set by auth middleware
+    const productId = req.body.productId;
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+        cart = new Cart({ user: userId, products: [] });
+    }
+    cart.products.push(productId);
+    await cart.save();
+    res.json({ success: true });
+};
+
+
+exports.getCart = async (req, res) => {
+    const userId = req.user._id;
+    const cart = await Cart.findOne({ user: userId }).populate('products');
+    res.json(cart);
+};
+
 
 exports.getallproductsSSR = async (req, res) => {
-    const products = await Product.find();
+    const page = parseInt(req.query.page) || 1;
+    const limit = 2;
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+        Product.find().skip(skip).limit(limit),
+        Product.countDocuments()
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
     ejs.renderFile(
         path.resolve(__dirname, '../views/index.ejs'),
-        { products: products },
+        { products, page, totalPages },
         function (err, str) {
             if (err) {
                 res.status(500).send('Error rendering page');
@@ -19,8 +48,7 @@ exports.getallproductsSSR = async (req, res) => {
             }
         }
     );
-}
-
+};
 
 exports.getaddform = async (req, res) => {
     ejs.renderFile(path.resolve(__dirname, '../views/add.ejs'), function (err, str) {

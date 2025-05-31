@@ -1,6 +1,9 @@
 require('dotenv').config();
 const express = require('express');
+require('./events')
 const server = express();
+const app = require('http').createServer(server);
+const io = require('socket.io')(app);
 const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -9,6 +12,7 @@ const productrouter = require('./routes/product');
 const userrouter = require('./routes/users')
 const path = require('path');
 const fs = require('fs');
+
 const public = fs.readFileSync(path.resolve(__dirname,'./public.key'),'utf-8');
 
 //db connect
@@ -43,11 +47,22 @@ server.use((req,res,next)=>{
 
 server.use(express.json());
 server.use('/auth',authrouter.router)
-server.use('/products',auth,productrouter.routers);
+server.use('/products',productrouter.routers);
 server.use('/users',auth,userrouter.routers1);
 
 
-server.listen(process.env.PORT,()=>{
+io.on('connection',(socket)=>{
+    console.log('socket ',socket.id);
+    socket.on('msg',(data) =>{
+        console.log({data})
+    });
+    setTimeout(() => {
+        socket.emit('servermsq',{server:'hi'});
+    }, 4000);
+}); 
+
+
+app.listen(process.env.PORT,()=>{
     console.log(`server is running on port ${process.env.PORT}`);
 });
 
